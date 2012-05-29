@@ -1,0 +1,21 @@
+{
+	"name": "synchronized",
+	"description": "Ensure that some code always executes exclusively, in the order it is called",
+	"version": "0.1.0",
+	"author": "Pieter Raubenheimer <pieter@wavana.com>",
+	"keywords": ["mutex", "asynchronous", "synchronous", "queue"],
+	"main": "./synchronized.js",
+	"engines": {
+		"node": ">= 0.6.0"
+	},
+	"dependencies": {
+	},
+  "devDependencies": {
+    "async": "0.1.18",
+    "nodeunit": "0.7.4"
+  },	
+	"repository" : {
+		"type" : "git",
+		"url" : "git@github.com:jupiter/node-synchronized.git"
+	}
+}
