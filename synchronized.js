@@ -1,4 +1,4 @@
-var callbackScopes = {};
+var queues = {};
 
 var scopeObjects = [];
 
@@ -24,17 +24,17 @@ function scopeKeyForObject(obj){
 }
 
 function freeScope(scopeKey) {
-  delete(callbackScopes[scopeKey]);
+  delete(queues[scopeKey]);
   delete(scopeObjects[scopeKey]);
   freedKeys.push(scopeKey);
 }
 
 function callNext(scopeKey) {
-  var callbacks = callbackScopes[scopeKey];    
+  var queue = queues[scopeKey];    
   
-  if (callbacks.length > 1) {
-    callbacks.pop();
-    callbacks[callbacks.length - 1]();  
+  if (queue.length > 1) {
+    queue.pop();
+    queue[queue.length - 1]();  
   } else {
     freeScope(scopeKey);
   }
@@ -44,15 +44,15 @@ function callNext(scopeKey) {
  * Ensure that some code (fn) always executes exclusively (by scope), 
  * in the order it is called (call done, then next)
  *
- * @param {Object} scope Object to use as scope, using strict equals '==='
+ * @param {Object} scopeObj Object to use as scope, using strict equals '==='
  * @param {Function} fn(cb) Code to call in synchronized fashion
  * @param {Function} done() Called with arguments passed to cb
  * @api public
  */
-module.exports = function synchd(scopeObj, fn, done){
+var synchd = module.exports = function synchd(scopeObj, fn, done){
   var scopeKey = scopeKeyForObject(scopeObj)
   
-  var callbacks = callbackScopes[scopeKey];  
+  var queue = queues[scopeKey];  
   
   var newFn = function(){
     fn(function(){
@@ -61,12 +61,44 @@ module.exports = function synchd(scopeObj, fn, done){
     });      
   }
   
-  if (callbacks) {
-    callbacks.unshift(newFn);
+  if (queue) {
+    queue.unshift(newFn);
   } else {
-    callbackScopes[scopeKey] = [newFn];
+    queues[scopeKey] = [newFn];
     newFn();
   }
+}
+
+/**
+ * Return a function that can be called with a callback
+ *
+ * @param {Object} [scopeObj]   Optional scope
+ * @param {Function} fn(cb)
+ * @return {Function} fn(*, done) Last ar
+ * @api public
+ */
+module.exports.fn = function(scopeObj, fn) {
+  if (!fn) {
+    fn = scopeObj;
+    scopeObj = null;
+  }
+  return function(){
+    var done = arguments[arguments.length - 1];
+    
+    if (arguments.length > 1) {
+      // Bind arguments to called fn
+      var newFn = fn,
+          newArguments = Array.prototype.slice.call(arguments, 0, arguments.length - 2);
+      
+      fn = function(done){
+        newArguments.push(done);
+        
+        newFn.call(null, newArguments);
+      };
+    }
+    
+    synchd(scopeObj, fn, done);
+  };
 }
 
 module.exports.freed = function(){

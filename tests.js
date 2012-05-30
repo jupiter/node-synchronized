@@ -169,6 +169,90 @@ exports['functions executed in sequence and arguments passed to done'] = {
     }
   },
   
+  'multiple calls with null/empty as scope': function(test){
+    var self = this;
+
+    var scopes = {
+      scopeA: null,
+      scopeB: null
+    };
+
+    var completedOrder = [];
+
+    test.expect(9);
+
+    synchd(scopes.scopeA, function(cb){
+      setTimeout(function(){
+        cb('firstArg', 'secondArg');
+      }, 500);
+    }, function(firstArg, secondArg){
+
+      test.same(firstArg, 'firstArg');
+      test.same(secondArg, 'secondArg'); 
+
+      completedOrder.push('scopeA-block1');
+      done();
+    });          
+
+    synchd(scopes.scopeB, function(cb){
+      setTimeout(function(){
+        cb('thirdArg', 'fourthArg');
+      }, 20);
+    }, function(firstArg, secondArg){
+
+      test.same(firstArg, 'thirdArg');
+      test.same(secondArg, 'fourthArg'); 
+
+      completedOrder.push('scopeB-block1');
+      done();
+    });          
+
+    synchd(scopes.scopeA, function(cb){
+      setTimeout(function(){
+        cb('fifthArg', 'sixthArg');
+      }, 50);
+    }, function(firstArg, secondArg){
+
+      test.same(firstArg, 'fifthArg');
+      test.same(secondArg, 'sixthArg'); 
+
+      completedOrder.push('scopeA-block2');
+      done();
+    });          
+
+    synchd(scopes.scopeB, function(cb){
+      setTimeout(function(){
+        cb('seventhArg', 'eighthArg');
+      }, 200);
+    }, function(firstArg, secondArg){
+
+      test.same(firstArg, 'seventhArg');
+      test.same(secondArg, 'eighthArg'); 
+
+      completedOrder.push('scopeB-block2');
+      done();
+    });          
+
+    var expectedCompletedOrder = [
+      'scopeA-block1',
+      'scopeB-block1',
+      'scopeA-block2',
+      'scopeB-block2'
+    ];
+
+    var expected = 4;
+
+    function done(){
+      expected--;
+
+      if (expected) return;
+      
+      test.same(expectedCompletedOrder, completedOrder);
+
+      test.done();
+    }
+  },  
+  
   'single call': function(test) {
     test.expect(2);
     
@@ -194,5 +278,39 @@ exports['functions executed in sequence and arguments passed to done'] = {
     test.same(0, synchd.inScope());
     
     test.done();
+  }
+}
+
+exports['can return a function for calling later'] = {
+  'without scope': function(test) {
+    test.expect(4);
+    
+    synchd.fn(function(done){
+      test.ok('main function called');
+      
+      done('err', 'other', 'args');
+    })(function(err, other, args){
+      test.same('err', err);
+      test.same('other', other);
+      test.same('args', args);
+      
+      test.done()
+    }); 
+  },
+  
+  'with scope': function(test) {
+    test.expect(4);
+    
+    synchd.fn('scope', function(done){
+      test.ok('main function called');
+      
+      done('err', 'other', 'args');
+    })(function(err, other, args){
+      test.same('err', err);
+      test.same('other', other);
+      test.same('args', args);
+      
+      test.done()
+    }); 
   }
 }
