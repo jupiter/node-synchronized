@@ -1,32 +1,23 @@
-var queues = {};
+var queues = [];
 
-var scopeObjects = [];
-
-var freedKeys = [];
+var scopeKeys = [];
 
 function scopeKeyForObject(obj){
-  if (!scopeObjects.length) {
-    scopeObjects.push(obj);
+  if (!scopeKeys.length) {
+    scopeKeys.push(obj);
     return 0;
   }
   
-  var key = scopeObjects.indexOf(obj);  
+  var key = scopeKeys.indexOf(obj);  
   if (key > -1) return key;
   
-  var newKey = freedKeys.pop();
-  if (newKey !== undefined) {
-    scopeObjects[newKey] = obj;
-    return newKey;
-  }
-  
-  scopeObjects.push(obj);
-  return scopeObjects.length - 1;
+  scopeKeys.push(obj);
+  return scopeKeys.length - 1;
 }
 
 function freeScope(scopeKey) {
-  delete(queues[scopeKey]);
-  delete(scopeObjects[scopeKey]);
-  freedKeys.push(scopeKey);
+  queues.splice(scopeKey, 1);
+  scopeKeys.splice(scopeKey, 1);
 }
 
 function callNext(scopeKey) {
@@ -101,10 +92,6 @@ module.exports.fn = function(scopeObj, fn) {
   };
 }
 
-module.exports.freed = function(){
-  return freedKeys.length;
-}
-
 module.exports.inScope = function(){
-  return Object.keys(scopeObjects).length;
+  return Object.keys(scopeKeys).length;
 }
