@@ -2,6 +2,8 @@ var queues = [];
 
 var scopeKeys = [];
 
+var freedKeys = [];
+
 function scopeKeyForObject(obj){
   if (!scopeKeys.length) {
     scopeKeys.push(obj);
@@ -11,20 +13,25 @@ function scopeKeyForObject(obj){
   var key = scopeKeys.indexOf(obj);  
   if (key > -1) return key;
   
+  var newKey = freedKeys.pop();
+  if (newKey !== undefined) {
+    scopeKeys[newKey] = obj;
+    return newKey;
+  }
+  
   scopeKeys.push(obj);
   return scopeKeys.length - 1;
 }
 
 function freeScope(scopeKey) {
-  queues.splice(scopeKey, 1);
-  scopeKeys.splice(scopeKey, 1);
+  delete(queues[scopeKey]);
+  delete(scopeKeys[scopeKey]);
+  freedKeys.push(scopeKey);
 }
 
-function callNext(scopeObj) {
-  var scopeKey = scopeKeyForObject(scopeObj);
-    
+function callNext(scopeKey) {
   var queue = queues[scopeKey];    
-
+  
   if (queue.length > 1) {
     queue.pop();
     queue[queue.length - 1]();  
@@ -50,7 +57,7 @@ var synchd = module.exports = function synchd(scopeObj, fn, done){
   var newFn = function(){
     fn(function(){
       if (done) { done.apply(null, arguments); }
-      callNext(scopeObj)
+      callNext(scopeKey)
     });      
   }
   
@@ -92,6 +99,10 @@ module.exports.fn = function(scopeObj, fn) {
     
     synchd(scopeObj, fn, done);
   };
+}
+
+module.exports.freed = function(){
+  return freedKeys.length;
 }
 
 module.exports.inScope = function(){
