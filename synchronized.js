@@ -1,4 +1,4 @@
-var queues = {};
+var queues = [];
 
 var scopeObjects = [];
 
