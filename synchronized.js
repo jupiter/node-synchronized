@@ -20,9 +20,11 @@ function freeScope(scopeKey) {
   scopeKeys.splice(scopeKey, 1);
 }
 
-function callNext(scopeKey) {
+function callNext(scopeObj) {
+  var scopeKey = scopeKeyForObject(scopeObj);
+    
   var queue = queues[scopeKey];    
-  
+
   if (queue.length > 1) {
     queue.pop();
     queue[queue.length - 1]();  
@@ -48,7 +50,7 @@ var synchd = module.exports = function synchd(scopeObj, fn, done){
   var newFn = function(){
     fn(function(){
       if (done) { done.apply(null, arguments); }
-      callNext(scopeKey)
+      callNext(scopeObj)
     });      
   }
   
