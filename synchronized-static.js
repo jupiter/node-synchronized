@@ -41,6 +41,18 @@ function callNext(scopeKey) {
 }
 
 /**
+ * Return whether the passed variable is a function
+ *
+ * @param {Mixed} value
+ * @return {Boolean}
+ * @api private
+ */
+function isFunction(value) {
+  return toString.call(value) == funcClass;
+}
+var funcClass = '[object Function]';
+
+/**
  * Ensure that some code (fn) always executes exclusively (by scope), 
  * in the order it is called (call done, then next)
  *
@@ -50,12 +62,14 @@ function callNext(scopeKey) {
  * @api public
  */
 var synchd = module.exports = function synchd(scopeObj, fn, done){
-  var scopeKey = scopeKeyForObject(scopeObj)
+  var self = this;
+  
+  var scopeKey = scopeKeyForObject(isFunction(scopeObj) ? scopeObj.call(self) : scopeObj);
   
   var queue = queues[scopeKey];  
   
   var newFn = function(){
-    fn(function(){
+    fn.call(self, function(){
       if (done) { done.apply(null, arguments); }
       callNext(scopeKey)
     });      
@@ -83,21 +97,23 @@ module.exports.fn = function(scopeObj, fn) {
     scopeObj = null;
   }
   return function(){
+    var self = this;
+    
     var done = arguments[arguments.length - 1];
     
     if (arguments.length > 1) {
       // Bind arguments to called fn
       var newFn = fn,
-          newArguments = Array.prototype.slice.call(arguments, 0, arguments.length - 2);
+          newArguments = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
       
       fn = function(done){
         newArguments.push(done);
         
-        newFn.call(null, newArguments);
+        newFn.apply(self, newArguments);
       };
     }
     
-    synchd(scopeObj, fn, done);
+    synchd.call(self, scopeObj, fn, done);
   };
 }
 
@@ -107,4 +123,8 @@ module.exports.freed = function(){
 
 module.exports.inScope = function(){
   return Object.keys(scopeKeys).length;
+}
+
+module.exports.scopeKeys = function(){
+  return scopeKeys;
 }

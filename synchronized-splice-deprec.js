@@ -1,3 +1,6 @@
+/**
+ * DEPRECATED: In favour of using static scope keys
+ */
 var queues = [];
 
 var scopeKeys = [];
@@ -43,12 +46,14 @@ function callNext(scopeObj) {
  * @api public
  */
 var synchd = module.exports = function synchd(scopeObj, fn, done){
+  var self = this;
+  
   var scopeKey = scopeKeyForObject(scopeObj)
   
   var queue = queues[scopeKey];  
   
   var newFn = function(){
-    fn(function(){
+    fn.call(self, function(){
       if (done) { done.apply(null, arguments); }
       callNext(scopeObj)
     });      
@@ -76,24 +81,30 @@ module.exports.fn = function(scopeObj, fn) {
     scopeObj = null;
   }
   return function(){
+    var self = this;
+    
     var done = arguments[arguments.length - 1];
     
     if (arguments.length > 1) {
       // Bind arguments to called fn
       var newFn = fn,
-          newArguments = Array.prototype.slice.call(arguments, 0, arguments.length - 2);
+          newArguments = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
       
       fn = function(done){
         newArguments.push(done);
         
-        newFn.call(null, newArguments);
+        newFn.apply(self, newArguments);
       };
     }
     
-    synchd(scopeObj, fn, done);
+    synchd.call(self, scopeObj, fn, done);
   };
 }
 
 module.exports.inScope = function(){
   return Object.keys(scopeKeys).length;
+}
+
+module.exports.scopeKeys = function(){
+  return scopeKeys;
 }
