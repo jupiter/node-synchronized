@@ -34,10 +34,18 @@ function callNext(scopeKey) {
   
   if (queue.length > 1) {
     queue.pop();
-    queue[queue.length - 1]();  
+
+    callWithProps(queue[queue.length - 1]);        
   } else {
     freeScope(scopeKey);
   }
+}
+
+function callWithProps(props) {
+  props.fn.call(props.context || null, function(){
+    if (props.done) { props.done.apply(null, arguments); }
+    callNext(props.scopeKey)
+  });  
 }
 
 /**
@@ -65,21 +73,21 @@ var synchd = module.exports = function synchd(scopeObj, fn, done){
   var self = this;
   
   var scopeKey = scopeKeyForObject(isFunction(scopeObj) ? scopeObj.call(self) : scopeObj);
-  
+
   var queue = queues[scopeKey];  
-  
-  var newFn = function(){
-    fn.call(self, function(){
-      if (done) { done.apply(null, arguments); }
-      callNext(scopeKey)
-    });      
-  }
+
+  var props = {
+    context: self,
+    scopeKey: scopeKey,
+    fn: fn,
+    done: done
+  };
   
   if (queue) {
-    queue.unshift(newFn);
+    queue.unshift(props);
   } else {
-    queues[scopeKey] = [newFn];
-    newFn();
+    queues[scopeKey] = [props];
+    callWithProps(props);
   }
 }
 
