@@ -35,7 +35,11 @@ function callNext(scopeKey) {
   if (queue.length > 1) {
     queue.pop();
 
-    callWithProps(queue[queue.length - 1]);        
+    var lastProps = queue[queue.length - 1];
+    
+    process.nextTick(function(){
+      callWithProps(lastProps);      
+    });
   } else {
     freeScope(scopeKey);
   }
