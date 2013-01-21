@@ -4,7 +4,7 @@
 	"version": "0.1.5",
 	"author": "Pieter Raubenheimer <pieter@wavana.com>",
 	"keywords": ["mutex", "asynchronous", "synchronous", "queue"],
-	"main": "./synchronized-static.js",
+	"main": "./synchronized-bind.js",
 	"engines": {
 		"node": ">= 0.6.0"
 	},
