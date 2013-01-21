@@ -1,5 +1,5 @@
 var synchd = require('./synchronized-static'),
-    synchdAlt = require('./synchronized-splice-deprec');
+    synchdAlt = require('./synchronized-fn');
 
 var _ = require('underscore');
 var async = require('async');
@@ -46,15 +46,16 @@ suite.add('Series w/o synchd', function(deferred) {
   async.forEach(calls, function(i, next){
     eaCalled += 1;
         
-    if (cache) return process.nextTick(next);
+    if (cache) return next();//process.nextTick(next);
     
     synchd(suite, function(next){
-      if (cache) return process.nextTick(next);
+      if (cache) return next();//process.nextTick(next);
 
       delayedValue(function(err, val){
         dvCalled += 1;
         cache = val;
-        process.nextTick(next);
+        next();
+        // process.nextTick(next);
       });      
     }, next);
   }, function(){
@@ -72,15 +73,16 @@ suite.add('Series w/o synchd', function(deferred) {
   async.forEach(calls, function(i, next){
     eaCalled += 1;
         
-    if (cache) return process.nextTick(next);
+    if (cache) return next();//process.nextTick(next);
     
     synchdAlt(suite, function(next){
-      if (cache) return process.nextTick(next);
+      if (cache) return next();//process.nextTick(next);
 
       delayedValue(function(err, val){
         dvCalled += 1;
         cache = val;
-        process.nextTick(next);
+        next();
+        // process.nextTick(next);
       });      
     }, next);
   }, function(){
@@ -88,6 +90,7 @@ suite.add('Series w/o synchd', function(deferred) {
     deferred.resolve();
   });
 }, { defer: true })
+
 
 // add listeners
 .on('cycle', function(event) {
