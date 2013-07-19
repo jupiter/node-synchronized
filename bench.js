@@ -1,5 +1,5 @@
 var synchd = require('./synchronized-static'),
-    synchdAlt = require('./synchronized-fn');
+    synchdAlt = require('./synchronized-bind');
 
 var _ = require('underscore');
 var async = require('async');
