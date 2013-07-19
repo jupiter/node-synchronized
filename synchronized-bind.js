@@ -71,13 +71,6 @@ var synchd = module.exports = function synchd(scopeObj, fn, done){
 
   var queue = queues[scopeKey];  
 
-  var props = {
-    context: self,
-    scopeKey: scopeKey,
-    fn: fn,
-    done: done
-  };
-  
   var queuedFn = function() {
     fn.call(self, function(){
       if (done) { done.apply(null, arguments); }
@@ -138,3 +131,14 @@ module.exports.inScope = function(){
 module.exports.scopeKeys = function(){
   return scopeKeys;
 }
+
+/*
+// TODO: For returning a cached value when available
+module.exports.cached = function(scopeObj, cacheFn, fn, done) {
+  cachedFn(function(){
+    synchd(scopeObj, function(done){
+      cachedFn(fn, done);      
+    }, done);    
+  }, done);  
+}
+*/
