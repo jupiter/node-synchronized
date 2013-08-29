@@ -116,14 +116,17 @@ module.exports.fn = function(scopeObj, fn) {
       var newFn = fn,
           newArguments = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
       
-      fn = function(callback){
+      var fnPassed = function(callback){
         newArguments.push(callback);
         
         newFn.apply(self, newArguments);
       };
     }
+    else {
+      var fnPassed = fn;
+    }
     
-    synchd.call(self, scopeObj, fn, done);
+    synchd.call(self, scopeObj, fnPassed, done);
   };
 }
 
