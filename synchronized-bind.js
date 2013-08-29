@@ -121,10 +121,8 @@ module.exports.fn = function(scopeObj, fn) {
         
         newFn.apply(self, newArguments);
       };
-    }
-    else {
+    } else
       var fnPassed = fn;
-    }
     
     synchd.call(self, scopeObj, fnPassed, done);
   };
