@@ -116,8 +116,8 @@ module.exports.fn = function(scopeObj, fn) {
       var newFn = fn,
           newArguments = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
       
-      fn = function(done){
-        newArguments.push(done);
+      fn = function(callback){
+        newArguments.push(callback);
         
         newFn.apply(self, newArguments);
       };
