@@ -1,4 +1,4 @@
-var synchd = require('./synchronized-static');
+var synchd = require('./synchronized-bind');
 
 exports['functions executed in sequence and arguments passed to done'] = {
   'multiple calls with objects as scope': function(test){
@@ -20,11 +20,11 @@ exports['functions executed in sequence and arguments passed to done'] = {
     }, function(firstArg, secondArg){
 
       test.same(firstArg, 'firstArg');
-      test.same(secondArg, 'secondArg'); 
+      test.same(secondArg, 'secondArg');
 
       completedOrder.push('scopeA-block1');
       done();
-    });          
+    });
 
     synchd(scopes.scopeB, function(cb){
       setTimeout(function(){
@@ -33,11 +33,11 @@ exports['functions executed in sequence and arguments passed to done'] = {
     }, function(firstArg, secondArg){
 
       test.same(firstArg, 'thirdArg');
-      test.same(secondArg, 'fourthArg'); 
+      test.same(secondArg, 'fourthArg');
 
       completedOrder.push('scopeB-block1');
       done();
-    });          
+    });
 
     synchd(scopes.scopeA, function(cb){
       setTimeout(function(){
@@ -46,11 +46,11 @@ exports['functions executed in sequence and arguments passed to done'] = {
     }, function(firstArg, secondArg){
 
       test.same(firstArg, 'fifthArg');
-      test.same(secondArg, 'sixthArg'); 
+      test.same(secondArg, 'sixthArg');
 
       completedOrder.push('scopeA-block2');
       done();
-    });          
+    });
 
     synchd(scopes.scopeB, function(cb){
       setTimeout(function(){
@@ -59,11 +59,11 @@ exports['functions executed in sequence and arguments passed to done'] = {
     }, function(firstArg, secondArg){
 
       test.same(firstArg, 'seventhArg');
-      test.same(secondArg, 'eighthArg'); 
+      test.same(secondArg, 'eighthArg');
 
       completedOrder.push('scopeB-block2');
       done();
-    });          
+    });
 
     var expectedCompletedOrder = [
       'scopeB-block1',
@@ -84,7 +84,7 @@ exports['functions executed in sequence and arguments passed to done'] = {
       test.done();
     }
   },
-  
+
   'multiple calls with equal strings as scope': function(test){
     var self = this;
 
@@ -104,11 +104,11 @@ exports['functions executed in sequence and arguments passed to done'] = {
     }, function(firstArg, secondArg){
 
       test.same(firstArg, 'firstArg');
-      test.same(secondArg, 'secondArg'); 
+      test.same(secondArg, 'secondArg');
 
       completedOrder.push('scopeA-block1');
       done();
-    });          
+    });
 
     synchd(scopes.scopeB, function(cb){
       setTimeout(function(){
@@ -117,11 +117,11 @@ exports['functions executed in sequence and arguments passed to done'] = {
     }, function(firstArg, secondArg){
 
       test.same(firstArg, 'thirdArg');
-      test.same(secondArg, 'fourthArg'); 
+      test.same(secondArg, 'fourthArg');
 
       completedOrder.push('scopeB-block1');
       done();
-    });          
+    });
 
     synchd(scopes.scopeA, function(cb){
       setTimeout(function(){
@@ -130,11 +130,11 @@ exports['functions executed in sequence and arguments passed to done'] = {
     }, function(firstArg, secondArg){
 
       test.same(firstArg, 'fifthArg');
-      test.same(secondArg, 'sixthArg'); 
+      test.same(secondArg, 'sixthArg');
 
       completedOrder.push('scopeA-block2');
       done();
-    });          
+    });
 
     synchd(scopes.scopeB, function(cb){
       setTimeout(function(){
@@ -143,11 +143,11 @@ exports['functions executed in sequence and arguments passed to done'] = {
     }, function(firstArg, secondArg){
 
       test.same(firstArg, 'seventhArg');
-      test.same(secondArg, 'eighthArg'); 
+      test.same(secondArg, 'eighthArg');
 
       completedOrder.push('scopeB-block2');
       done();
-    });          
+    });
 
     var expectedCompletedOrder = [
       'scopeA-block1',
@@ -162,13 +162,13 @@ exports['functions executed in sequence and arguments passed to done'] = {
       expected--;
 
       if (expected) return;
-      
+
       test.same(expectedCompletedOrder, completedOrder);
 
       test.done();
     }
   },
-  
+
   'multiple calls with null/empty as scope': function(test){
     var self = this;
 
@@ -188,11 +188,11 @@ exports['functions executed in sequence and arguments passed to done'] = {
     }, function(firstArg, secondArg){
 
       test.same(firstArg, 'firstArg');
-      test.same(secondArg, 'secondArg'); 
+      test.same(secondArg, 'secondArg');
 
       completedOrder.push('scopeA-block1');
       done();
-    });          
+    });
 
     synchd(scopes.scopeB, function(cb){
       setTimeout(function(){
@@ -201,11 +201,11 @@ exports['functions executed in sequence and arguments passed to done'] = {
     }, function(firstArg, secondArg){
 
       test.same(firstArg, 'thirdArg');
-      test.same(secondArg, 'fourthArg'); 
+      test.same(secondArg, 'fourthArg');
 
       completedOrder.push('scopeB-block1');
       done();
-    });          
+    });
 
     synchd(scopes.scopeA, function(cb){
       setTimeout(function(){
@@ -214,11 +214,11 @@ exports['functions executed in sequence and arguments passed to done'] = {
     }, function(firstArg, secondArg){
 
       test.same(firstArg, 'fifthArg');
-      test.same(secondArg, 'sixthArg'); 
+      test.same(secondArg, 'sixthArg');
 
       completedOrder.push('scopeA-block2');
       done();
-    });          
+    });
 
     synchd(scopes.scopeB, function(cb){
       setTimeout(function(){
@@ -227,11 +227,11 @@ exports['functions executed in sequence and arguments passed to done'] = {
     }, function(firstArg, secondArg){
 
       test.same(firstArg, 'seventhArg');
-      test.same(secondArg, 'eighthArg'); 
+      test.same(secondArg, 'eighthArg');
 
       completedOrder.push('scopeB-block2');
       done();
-    });          
+    });
 
     var expectedCompletedOrder = [
       'scopeA-block1',
@@ -246,16 +246,16 @@ exports['functions executed in sequence and arguments passed to done'] = {
       expected--;
 
       if (expected) return;
-      
+
       test.same(expectedCompletedOrder, completedOrder);
 
       test.done();
     }
-  },  
-  
+  },
+
   'single call': function(test) {
     test.expect(2);
-    
+
     synchd('scope', function(cb){
       test.ok('main function called');
       cb();
@@ -263,20 +263,20 @@ exports['functions executed in sequence and arguments passed to done'] = {
 
       test.same(1, synchd.inScope());
 
-      test.done();      
-    });        
+      test.done();
+    });
   },
-  
+
   'with no `done` callback passed': function(test) {
     test.expect(2);
-    
+
     synchd('scope', function(cb){
       test.ok('main function called');
       cb();
-    });    
-    
+    });
+
     test.same(0, synchd.inScope());
-    
+
     test.done();
   }
 }
@@ -284,39 +284,39 @@ exports['functions executed in sequence and arguments passed to done'] = {
 exports['can return a function for calling later'] = {
   'without scope': function(test) {
     test.expect(4);
-    
+
     synchd.fn(function(done){
       test.ok('main function called');
-      
+
       done('err', 'other', 'args');
     })(function(err, other, args){
       test.same('err', err);
       test.same('other', other);
       test.same('args', args);
-      
+
       test.done()
-    }); 
+    });
   },
-  
+
   'with scope': function(test) {
     test.expect(4);
-    
+
     synchd.fn('scope', function(done){
       test.ok('main function called');
-      
+
       done('err', 'other', 'args');
     })(function(err, other, args){
       test.same('err', err);
       test.same('other', other);
       test.same('args', args);
-      
+
       test.done()
-    }); 
+    });
   },
-  
+
   'with function to determine scope': function(test) {
     test.expect(4);
-  
+
     synchd.fn(function(){
       test.ok('scope function called');
 
@@ -328,11 +328,11 @@ exports['can return a function for calling later'] = {
     })('firstArg', function(firstArg, scopeKeys){
       test.same('firstArg', firstArg);
       test.same(['abc'], scopeKeys);
-      
+
       test.done();
     });
   },
-  
+
   'retaining context': {
     'with only callback': function(test) {
       test.expect(2);
@@ -353,7 +353,7 @@ exports['can return a function for calling later'] = {
         test.done();
       });
     },
-    
+
     'with argument and callback': function(test) {
       test.expect(3);
 
@@ -374,6 +374,172 @@ exports['can return a function for calling later'] = {
         test.done();
       });
     }
-    
+
   }
 }
+
+exports['can return a function for use as in a cache lookup'] = {
+  setUp: function(done) {
+    var self = this;
+
+    self.localCache = {};
+    self.remoteCacheLookups = 0;
+    self.remoteCacheLookup = function(cb) {
+      self.remoteCacheLookups++;
+      setTimeout(cb.bind(null, self.remoteCacheLookups), 10);
+    };
+
+    done();
+  },
+
+  'with only callback': {
+    setUp: function(done) {
+      var self = this;
+
+      function MyObject(id) { this.id = id; }
+
+      MyObject.prototype.testFn = synchd.cachedFn(function(){
+        return this.id;
+      }, function(cb, cont){
+        var found = self.localCache[this.id];
+
+        if (found) return cb(null, found);
+        cont();
+      }, function(cb) {
+        var id = this.id;
+
+        self.remoteCacheLookup(function(val) {
+          self.localCache[id] = val;
+          cb(null, self.localCache[id]);
+        });
+      });
+
+      self.firstObj = new MyObject('abc');
+      self.secondObj = new MyObject({ objectAsId: 'def' });
+      self.thirdObj = new MyObject({ objectAsId: 'ghi' });
+      done();
+    },
+
+    'subsequent calls will use local cache': function(test) {
+      var self = this;
+      var results = [];
+
+      self.firstObj.testFn(function(){
+        results.push(arguments);
+      });
+      self.firstObj.testFn(function(){
+        results.push(arguments);
+      });
+      self.firstObj.testFn(function(){
+        results.push(arguments);
+
+        test.same(self.remoteCacheLookups, 1);
+        test.same('1', results[0][1]);
+        test.same(results[0][1], results[1][1]);
+        test.same(results[1][1], results[2][1]);
+
+        test.done();
+      });
+    },
+
+    'scopes isolate stacks': function(test) {
+      var self = this;
+      var results = [];
+
+      self.firstObj.testFn(function(){
+        results.push(arguments);
+      });
+      self.secondObj.testFn(function(){
+        results.push(arguments);
+      });
+      self.thirdObj.testFn(function(){
+        results.push(arguments);
+
+        test.same(self.remoteCacheLookups, 3);
+        test.same('1', results[0][1]);
+        test.same('2', results[1][1]);
+        test.same('3', results[2][1]);
+
+        test.done();
+      });
+    }
+  },
+
+  'with arguments and callback': {
+    setUp: function(done) {
+      var self = this;
+
+      function MyObject(id) { this.id = id; }
+
+      MyObject.prototype.testFn = synchd.cachedFn(function(){
+        return this.id;
+      }, function(firstArg, secondArg, cb, cont){
+        var found = self.localCache[this.id];
+
+        if (found) return cb(null, found);
+        cont();
+      }, function(firstArg, secondArg, cb) {
+        var id = this.id;
+
+        self.remoteCacheLookup(function(val) {
+          self.localCache[id] = val + firstArg + secondArg;
+          cb(null, self.localCache[id]);
+        });
+      });
+
+      self.firstObj = new MyObject('abc');
+      self.secondObj = new MyObject({ objectAsId: 'def' });
+      self.thirdObj = new MyObject({ objectAsId: 'ghi' });
+      done();
+    },
+
+    'subsequent calls will use local cache': function(test) {
+      var self = this;
+      var results = [];
+
+      self.firstObj.testFn('a', 'a', function(){
+        results.push(arguments);
+      });
+      self.firstObj.testFn('a', 'b', function(){
+        results.push(arguments);
+      });
+      self.firstObj.testFn('a', 'c', function(){
+        results.push(arguments);
+
+        test.same(self.remoteCacheLookups, 1);
+        test.same('1aa', results[0][1]);
+        test.same(results[0][1], results[1][1]);
+        test.same(results[1][1], results[2][1]);
+
+        test.done();
+      });
+    },
+
+    'scopes isolate stacks': function(test) {
+      var self = this;
+      var results = [];
+
+      self.firstObj.testFn('a', 'a', function(){
+        results.push(arguments);
+      });
+      self.secondObj.testFn('a', 'b', function(){
+        results.push(arguments);
+      });
+      self.thirdObj.testFn('a', 'c', function(){
+        results.push(arguments);
+
+        test.same(self.remoteCacheLookups, 3);
+        test.same('1aa', results[0][1]);
+        test.same('2ab', results[1][1]);
+        test.same('3ac', results[2][1]);
+
+        test.done();
+      });
+    }
+  }
+
+}
+
+// process.on('uncaughtException', function(err) {
+//   console.log('Caught exception: ' + err, err.stack);
+// });
