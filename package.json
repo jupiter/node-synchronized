@@ -1,21 +1,28 @@
 {
-	"name": "synchronized",
-	"description": "Ensure that some code always executes exclusively, in the order it is called",
-	"version": "0.2.0",
-	"author": "Pieter Raubenheimer <pieter@wavana.com>",
-	"keywords": ["mutex", "asynchronous", "synchronous", "queue"],
-	"main": "./synchronized-bind.js",
-	"engines": {
-		"node": ">= 0.6.0"
-	},
-	"dependencies": {
-	},
+  "name": "synchronized",
+  "description": "Ensure that some code always executes exclusively, in the order it is called",
+  "version": "0.2.0",
+  "author": "Pieter Raubenheimer <pieter@wavana.com>",
+  "keywords": [
+    "mutex",
+    "asynchronous",
+    "synchronous",
+    "queue"
+  ],
+  "main": "./synchronized-bind.js",
+  "license": "MIT",
+  "engines": {
+    "node": ">= 0.6.0"
+  },
   "devDependencies": {
     "async": "0.1.18",
-    "nodeunit": "0.7.4"
+    "nodeunit": "^0.9.1"
   },
-	"repository" : {
-		"type" : "git",
-		"url" : "git@github.com:jupiter/node-synchronized.git"
-	}
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:jupiter/node-synchronized.git"
+  },
+  "scripts": {
+    "test": "./test"
+  }
 }

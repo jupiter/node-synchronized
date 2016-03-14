@@ -6,97 +6,94 @@ Ensure that some code always executes exclusively, in the order it is called
 Examples
 --------
 
-This is particularly useful if you have some asynchronous code that should not
-be executing concurrently, e.g. where the next call relies on the result of the
-previous call. (Also see last example below.)
+Where you have some asynchronous code that should not be executing concurrently,
+e.g. where the next call relies on the result of the previous call. Some string
+or object identifies the scope of mutual-exclusion.
 
-```
-  var synchd = require('synchronized');
+```js
+var synchd = require('synchronized');
 
-  MyObject.prototype.fetchedDocument = function(id, cb) {
-    var self = this;
-
-    synchd(self._documentCache, function(done){
-      // Return cached response if available
-      if (self._documentCache[id]) {
-        return done(null, self._documentCache[id]);
-      }
-
-      // Otherwise fetch
-      Model.findById(id, function(err, document){
-        // ...
-
-        self._documentCache[id] = document;
-        done(null, document);
-      });
-    }, cb);
+synchd(cachedDocs, function(done){
+  // Return cached response if available
+  if (cachedDocs[id]) {
+    return done(null, cachedDocs[id]);
   }
 
-```
-
-A factory for when you're passing multiple asynchronous functions to a flow-control
-library method, such as [async](https://github.com/caolan/async).parallel(),
-and you have a dependency or other reason for wanting a subset of the executed
-functions not be called concurrently.
-
-```
-
-  async.parallel({
-    company: synchd.fn(this.companyId, function(done){
-      person.fetchedCompany(done);
-    }),
-
-    // ... Other functions
-
-    companyManager: synchd.fn(this.companyId, function(done){
-      person.fetchedCompany(function(err, company){
-        if (err) etc.
-
-        done(null, company.manager);
-      });
-    })
-  }, function(err, results){
-    if (err) etc.
-
+  // Otherwise fetch
+  Model.findById(id, function(err, document){
     // ...
+
+    cachedDocs[id] = document;
+    done(null, document);
   });
-
+}, cb);
 ```
 
-For the case of having a local cache to some expensive asynchronous call.
+You can also conveniently create a last-argument error-first callback function
+to pass to a flow-control library structure, such as the ones available in
+[async](https://github.com/caolan/async).
 
-```
-  var myObj = { id: 'abc', localCache: null, localCachedAt: null };
 
-  myObj.lookup = synchd.cachedFn(function scopeLookup() {
-    return this;
-  }, function cacheLookup(cb, cont) {
-    // Return cached response if available
-    if (this.localCachedAt) return cb(null, this.localCache);
+```js
+async.parallel({
+  company: synchd.fn(companyId, function(done){
+    fetchedCompany(companyId, done);
+  }),
 
-    cont();
-  }, function remoteLookup(cb) {
-    var self = this;
+  companyManager: synchd.fn(companyId, function(done){
+    fetchedCompany(companyId, function(err, company){
+      if (err) // ...
 
-    // Otherwise fetch
-    Model.findById(self.id, function(err, document){
-      // ....
-
-      self.localCachedAt = new Date();
-      self.localCache = document;
-      done(null, document);
+      done(null, company.manager);
     });
   })
+}, function(err, results){
+  if (err) // ...
+});
+```
 
-  myObj.lookup(function(err, document){ console.log(myObj.localCachedAt) });
-  myObj.lookup(function(err, document){ console.log(myObj.localCachedAt) });
+As an optimization, you may want to create reusable function that will first
+try to perform a cheap, non-mutually-exclusive operation, such as an in-memory
+cache lookup, before performing the expensive, mutually-exclusive operation.
+
+Such a cache lookup function would again be performed before executing queued
+calls to the expensive operation so as to avoid it when possible.
+
+Note that the context (`this`) can be used where the reusable function is stored
+on an object.
+
+```js
+var myObj = { id: 'abc', localCache: null, localCachedAt: null };
+
+myObj.lookup = synchd.cachedFn(function scopeLookup() {
+  return this;
+}, function cacheLookup(cb, cont) {
+  // Return cached response if available
+  if (this.localCachedAt) return cb(null, this.localCache);
+
+  cont();
+}, function expensiveLookup(cb) {
+  var self = this;
+
+  // Otherwise fetch
+  Model.findById(self.id, function(err, document){
+    // ....
+
+    self.localCachedAt = new Date();
+    self.localCache = document;
+    done(null, document);
+  });
+})
+
+myObj.lookup(function(err, document){ console.log(myObj.localCachedAt) });
+myObj.lookup(function(err, document){ console.log(myObj.localCachedAt) });
 ```
 
 Prints:
 
 ```
-  Tue Sep 16 2014 15:17:35 GMT+0100 (BST)
-  Tue Sep 16 2014 15:17:35 GMT+0100 (BST)
+Tue Sep 16 2014 15:17:35 GMT+0100 (BST)
+Tue Sep 16 2014 15:17:35 GMT+0100 (BST)
 ```
 
 Usage
@@ -135,13 +132,6 @@ callback
 Note: if newFn is called in context of an object, this will be the context
 fn and cacheLookupFn.
 
-
-Installation
-------------
-
-
-Inspiration
------------
-
 License
 -------
+MIT
